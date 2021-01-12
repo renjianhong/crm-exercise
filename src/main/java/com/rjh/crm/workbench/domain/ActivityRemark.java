@@ -6,12 +6,12 @@ package com.rjh.crm.workbench.domain;
  */
 public class ActivityRemark {
     private String id;
-    private String noteContent;
+    private String noteContent; // 备注
     private String createTime;
     private String createBy;
     private String editTime;
     private String editBy;
-    private String editFlag;
+    private String editFlag; // 是否修改的标记
     private String activityId;
 
     public ActivityRemark() {}

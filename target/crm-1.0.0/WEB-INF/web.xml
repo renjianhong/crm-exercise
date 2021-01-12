@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
   <display-name>crm</display-name>
+
+  <!--给所有请求和响应的post设置字符集-->
   <filter>
     <filter-name>EncodingFilter</filter-name>
     <filter-class>com.rjh.crm.web.filter.EncodingFilter</filter-class>
@@ -9,6 +11,8 @@
     <filter-name>EncodingFilter</filter-name>
     <url-pattern>*.do</url-pattern>
   </filter-mapping>
+
+  <!--进行判断是否登录的过滤器-->
   <filter>
     <filter-name>LoginFilter</filter-name>
     <filter-class>com.rjh.crm.web.filter.LoginFilter</filter-class>
@@ -18,6 +22,8 @@
     <url-pattern>*.jsp</url-pattern>
     <url-pattern>*.do</url-pattern>
   </filter-mapping>
+
+  <!--用户-->
   <servlet>
     <servlet-name>UserController</servlet-name>
     <servlet-class>com.rjh.crm.setting.web.controller.UserController</servlet-class>
@@ -26,6 +32,18 @@
     <servlet-name>UserController</servlet-name>
     <url-pattern>/setting/user/login.do</url-pattern>
     <url-pattern>/setting/user/xxx.do</url-pattern>
+  </servlet-mapping>
+
+  <!--市场活动-->
+  <servlet>
+    <servlet-name>ActivityController</servlet-name>
+    <servlet-class>com.rjh.crm.workbench.web.controller.ActivityController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ActivityController</servlet-name>
+    <url-pattern>/workbench/activity/getUserList.do</url-pattern>
+    <url-pattern>/workbench/activity/xxx.do</url-pattern>
+
   </servlet-mapping>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>

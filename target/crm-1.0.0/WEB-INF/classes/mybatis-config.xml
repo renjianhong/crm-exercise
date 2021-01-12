@@ -9,7 +9,7 @@
   <typeAliases>
   
   	<package name="com.rjh.crm.setting.domain"/>
-  	
+    <package name="com.rjh.crm.workbench.domain"/>
   
   </typeAliases>
   
@@ -29,9 +29,8 @@
   
  
   <mappers>
-   
       <package name="com.rjh.crm.setting.dao"/>
-    
+      <package name="com.rjh.crm.workbench.dao"/>
   </mappers>
 </configuration>
 

@@ -6,12 +6,12 @@ package com.rjh.crm.workbench.domain;
  */
 public class Activity {
     private String id;
-    private String owner;
+    private String owner; // 所有者,外键关联User
     private String name;
     private String startDate;
     private String endDate;
-    private String cost;
-    private String description;
+    private String cost; // 成本
+    private String description; // 描述
     private String createTime;
     private String createBy;
     private String editTime;
