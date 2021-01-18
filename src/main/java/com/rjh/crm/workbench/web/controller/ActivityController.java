@@ -7,6 +7,7 @@ import com.rjh.crm.util.DateTimeUtil;
 import com.rjh.crm.util.PrintJson;
 import com.rjh.crm.util.ServiceFactory;
 import com.rjh.crm.util.UUIDUtil;
+import com.rjh.crm.vo.PaginationVO;
 import com.rjh.crm.workbench.domain.Activity;
 import com.rjh.crm.workbench.service.ActivityService;
 import com.rjh.crm.workbench.service.impl.ActivityServiceImpl;
@@ -17,7 +18,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.Service;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author rjh
@@ -32,7 +35,33 @@ public class ActivityController extends HttpServlet {
             getUserList(request, response);
         } else if ("/workbench/activity/save.do".equals(path)) {
             save(request, response);
+        } else if ("/workbench/activity/pageList.do".equals(path)) {
+            pageList(request, response);
         }
+    }
+
+    private void pageList(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("进入到分页查询");
+        String name = request.getParameter("name");
+        String owner = request.getParameter("owner");
+        String startDate = request.getParameter("startDate");
+        String endDate = request.getParameter("endDate");
+
+        Integer pageNo = Integer.valueOf(request.getParameter("pageNo"));
+        Integer pageSize = Integer.valueOf(request.getParameter("pageSize"));
+        Integer pageCount = pageSize * (pageNo - 1);
+
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("name", name);
+        map.put("owner", owner);
+        map.put("startDate", startDate);
+        map.put("endDate", endDate);
+        map.put("pageSize", pageSize);
+        map.put("pageCount", pageCount);
+
+        ActivityService as = (ActivityService) ServiceFactory.getService(new ActivityServiceImpl());
+        PaginationVO<Activity> vo = as.pageList(map);
+        PrintJson.printJsonObj(response, vo);
     }
 
     private void save(HttpServletRequest request, HttpServletResponse response) {

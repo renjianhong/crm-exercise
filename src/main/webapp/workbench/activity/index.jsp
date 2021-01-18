@@ -11,15 +11,17 @@ request.getContextPath() + "/";
 
 <link href="jquery/bootstrap_3.3.0/css/bootstrap.min.css" type="text/css" rel="stylesheet" />
 <link href="jquery/bootstrap-datetimepicker-master/css/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" />
-
+<link href="jquery/bs_pagination/jquery.bs_pagination.min.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="jquery/jquery-1.11.1-min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap_3.3.0/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/js/bootstrap-datetimepicker.js"></script>
 <script type="text/javascript" src="jquery/bootstrap-datetimepicker-master/locale/bootstrap-datetimepicker.zh-CN.js"></script>
-
+<script type="text/javascript" src="jquery/bs_pagination/jquery.bs_pagination.min.js"></script>
+<script type="text/javascript" src="jquery/bs_pagination/en.js"></script>
 <script type="text/javascript">
 
 	$(function(){
+		pageList(1, 2);
 		$("#addBtn").click(function () {
 
 			//时间控件
@@ -66,6 +68,7 @@ request.getContextPath() + "/";
 				dataType : "json",
 				type : "GET",
 				success : function(data) {
+					pageList(1, 10);
 					if (data.success) {
 						$("#addActivityForm")[0].reset();
 						$("#createActivityModal").modal("hide");
@@ -78,13 +81,25 @@ request.getContextPath() + "/";
 
 		$("#searchBtn").click(function () {
 
+			$("#hidden-name").val($("#search-name").val());
+			$("#hidden-owner").val($("#search-owner").val());
+			$("#hidden-startDate").val($("#search-startDate").val());
+			$("#hidden-endDate").val($("#search-endDate").val());
+
+			pageList(1, 2);
 		})
 		
 	})
 	function pageList(pageNo, pageSize) {
+
+		$("#search-name").val($("#hidden-name").val());
+		$("#search-owner").val($("#hidden-owner").val());
+		$("#search-startDate").val($("#hidden-startDate").val());
+		$("#search-endDate").val($("#hidden-endDate").val());
+
 		$.ajax({
-			utl : "workbench/activity/pageList.do",
-			data : {
+			url: "workbench/activity/pageList.do",
+			data: {
 				"pageNo" : pageNo,
 				"pageSize" : pageSize,
 				"name" : $.trim($("#search-name").val()),
@@ -92,27 +107,48 @@ request.getContextPath() + "/";
 				"startDate" : $.trim($("#search-startDate").val()),
 				"endDate" : $.trim($("#search-endDate").val())
 			},
-			type : "GET",
-			dataType : "json",
+			dataType: "json",
+			type: "GET",
 			success : function (data) {
 				var html = "";
 				$.each(data.dataList, function (i, activity) {
 					html += '<tr class="active">';
-					html += '<td><input type="checkbox" value="'+ data.id +'"/></td>';
-					html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.jsp\';">'+ data.name +'</a></td>';
-					html += '<td>'+ data.owner +'</td>';
-					html += '<td>'+ data.startDate +'</td>';
-					html += '<td>'+ data.endDate +'</td>';
+					html += '<td><input type="checkbox" value="'+ activity.id +'"/></td>';
+					html += '<td><a style="text-decoration: none; cursor: pointer;" onclick="window.location.href=\'workbench/activity/detail.jsp\';">'+ activity.name +'</a></td>';
+					html += '<td>'+ activity.owner +'</td>';
+					html += '<td>'+ activity.startDate +'</td>';
+					html += '<td>'+ activity.endDate +'</td>';
 					html += '</tr>';
 				})
 				$("#activityBody").html(html);
+				var totalPages = Math.ceil(data.total / pageSize);
+				$("#activityPage").bs_pagination({
+					currentPage: pageNo,
+					rowsPerPage: pageSize,
+					maxRowsPerPage: 20,
+					totalPages: totalPages,
+					totalRows: data.total,
+
+					visiblePageLinks: 3,
+
+					showGoToPage: true,
+					showRowsPerPage: true,
+					showRowsInfo: true,
+					showRowsDefaultInfo: true,
+					onChangePage : function(event, data) {
+						pageList(data.currentPage, data.rowsPerPage);
+					}
+				})
 			}
 		})
 	}
 </script>
 </head>
 <body>
-
+	<input type="hidden" id="hidden-owner"/>
+	<input type="hidden" id="hidden-name"/>
+	<input type="hidden" id="hidden-startDate"/>
+	<input type="hidden" id="hidden-endDate"/>
 	<!-- 创建市场活动的模态窗口 -->
 	<div class="modal fade" id="createActivityModal" role="dialog">
 		<div class="modal-dialog" role="document" style="width: 85%;">
@@ -274,13 +310,13 @@ request.getContextPath() + "/";
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">开始日期</div>
-					  <input class="form-control" type="text" id="search-startDate" />
+					  <input class="form-control time" type="text" id="search-startDate" />
 				    </div>
 				  </div>
 				  <div class="form-group">
 				    <div class="input-group">
 				      <div class="input-group-addon">结束日期</div>
-					  <input class="form-control" type="text" id="search-endDate">
+					  <input class="form-control time" type="text" id="search-endDate">
 				    </div>
 				  </div>
 				  
@@ -327,37 +363,8 @@ request.getContextPath() + "/";
 			</div>
 			
 			<div style="height: 50px; position: relative;top: 30px;">
-				<div>
-					<button type="button" class="btn btn-default" style="cursor: default;">共<b>50</b>条记录</button>
-				</div>
-				<div class="btn-group" style="position: relative;top: -34px; left: 110px;">
-					<button type="button" class="btn btn-default" style="cursor: default;">显示</button>
-					<div class="btn-group">
-						<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
-							10
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu" role="menu">
-							<li><a href="#">20</a></li>
-							<li><a href="#">30</a></li>
-						</ul>
-					</div>
-					<button type="button" class="btn btn-default" style="cursor: default;">条/页</button>
-				</div>
-				<div style="position: relative;top: -88px; left: 285px;">
-					<nav>
-						<ul class="pagination">
-							<li class="disabled"><a href="#">首页</a></li>
-							<li class="disabled"><a href="#">上一页</a></li>
-							<li class="active"><a href="#">1</a></li>
-							<li><a href="#">2</a></li>
-							<li><a href="#">3</a></li>
-							<li><a href="#">4</a></li>
-							<li><a href="#">5</a></li>
-							<li><a href="#">下一页</a></li>
-							<li class="disabled"><a href="#">末页</a></li>
-						</ul>
-					</nav>
+				<div id="activityPage">
+
 				</div>
 			</div>
 			

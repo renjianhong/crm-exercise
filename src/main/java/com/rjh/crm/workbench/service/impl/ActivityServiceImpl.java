@@ -1,9 +1,15 @@
 package com.rjh.crm.workbench.service.impl;
 
 import com.rjh.crm.util.SqlSessionUtil;
+import com.rjh.crm.vo.PaginationVO;
 import com.rjh.crm.workbench.dao.ActivityDao;
 import com.rjh.crm.workbench.domain.Activity;
 import com.rjh.crm.workbench.service.ActivityService;
+
+import java.awt.print.Pageable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author rjh
@@ -11,6 +17,15 @@ import com.rjh.crm.workbench.service.ActivityService;
  */
 public class ActivityServiceImpl implements ActivityService {
     private ActivityDao activityDao = (ActivityDao) SqlSessionUtil.getSqlSession().getMapper(ActivityDao.class);
+
+    public PaginationVO<Activity> pageList(Map<String, Object> map) {
+        int total = activityDao.getTotalByCondition(map);
+        List<Activity> dataList = activityDao.getActivityListByCondition(map);
+        PaginationVO<Activity> vo = new PaginationVO<Activity>();
+        vo.setDataList(dataList);
+        vo.setTotal(total);
+        return vo;
+    }
 
     public boolean save(Activity activity) {
         boolean flag = false;
